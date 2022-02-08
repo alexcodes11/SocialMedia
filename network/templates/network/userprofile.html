@@ -1,0 +1,33 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+
+
+{% for person in persons %}
+
+{{person.username}}
+
+{% if user.is_authenticated %}
+<form action="{% url 'follow' person.username %}" method="post">
+   {% csrf_token %}
+<button>Follow</button>
+</form>
+
+<form action="{% url 'unfollow' person.username %}" method="post">
+   {% csrf_token %}
+<button>Unfollow</button>
+</form>
+{% endif %}
+
+{% endfor %}
+
+{% for post in posts %}
+   <ul>
+      <a href="{% url 'username' post.person %}"><li>{{post.person}}</li></a>
+   <li>{{post.post}}</li>
+   <li>{{post.timestamp}}</li>
+</ul>
+   <br>
+   {% endfor %}
+
+{% endblock %}
