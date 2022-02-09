@@ -21,9 +21,10 @@ def index(request):
     page_obj = paginator.get_page(page_number)
     return render(request, "network/index.html", {"page_obj": page_obj})
 
-def following(request):
-    pass
-
+def following(request, user_id):
+    names = Posts.objects.filter(person__following__person= user_id)
+    return render(request, "network/following.html", {"names": names})
+    
 
 def login_view(request):
     if request.method == "POST":
