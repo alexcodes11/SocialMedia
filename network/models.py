@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
+from django.forms import ValidationError
 
 
 class User(AbstractUser):
@@ -29,8 +30,20 @@ def update_profile_signal(sender, instance, created, **kwargs):
 
 
 class Likes(models.Model):
-    post = models.ForeignKey(Posts, on_delete= models.CASCADE , related_name='post_id')
+    post = models.OneToOneField(Posts, on_delete= models.CASCADE , related_name='post_id')
     likes = models.ManyToManyField(User, related_name= 'likes')
+
+    def serialize(self):
+        return {
+            "id": self.post,
+            "likes": self.likes.count()
+        }
+
+@receiver(post_save, sender=User)
+def likebutton(sender, instance, created, **kwargs):
+    if created:     
+        Likes.objects.create(post=instance)
+    
 
 
 

@@ -11,7 +11,7 @@ from django.core.paginator import Paginator
 from django.core.exceptions import FieldDoesNotExist
 
 
-from .models import  User, Posts, Following
+from .models import  Likes, User, Posts, Following
 
 
 def index(request):
@@ -24,7 +24,6 @@ def index(request):
 def following(request, user_id):
     names = Posts.objects.filter(person__following__person= user_id)
     return render(request, "network/following.html", {"names": names})
-    
 
 def login_view(request):
     if request.method == "POST":
@@ -89,8 +88,21 @@ def username(request, person_url):
     if request.method == "GET":
         person = User.objects.filter(username = person_url)
         posts = Posts.objects.filter(person__username = person_url)
-        return render(request, "network/userprofile.html", {"persons": person, "posts": posts})
+        if Following.objects.filter(person__username = person_url).exists():
+            following = Following.objects.filter(person__username=person_url ).count()
+        else:
+            following = 0
+        if Following.objects.filter(following__username = person_url).exists():
+            followers = Following.objects.filter(following__username = person_url).count()
+        else:
+            followers = 0
+        userisfollowing = False 
+        if Following.objects.filter(person = request.user.id).exists():
+            if Following.objects.filter(person = request.user.id, following__username = person_url).exists():
+                userisfollowing = True
+        return render(request, "network/userprofile.html", {"persons": person, "posts": posts, "followers": followers, "following":following, "userisfollowing": userisfollowing})
 
+# come back to this later and make sure the user cannot follow themselves. Already removed the button though templates but gotta make sure.
 @login_required
 def follow(request, person_url):
     if request.method == "POST":
@@ -116,7 +128,34 @@ def unfollow(request, person_url):
             test = Following.objects.get(person = user )
             test.following.remove(follow.id)
         else:
-            # print error message
-            pass
+            return render(request, "network/error.html", {"message": "You do not follow this user, therefore you cannot unfollow them"})
         return redirect('username', person_url) 
+
+# Need to change this so you can like via javascript API
+@login_required
+def likes(request, post_id):
+    user = User.objects.get(pk = request.user.id)
+    post = Posts.objects.get(person = post_id)
+    if Likes.objects.filter(post = post).exists():
+        new_like = Likes.objects.get(post = post)
+        new_like.likes.add(user)
+        new_like.save()
+    else:
+        new = Likes.objects.create(post = post)
+        new.likes.add(user)
+        new.save()
+    return redirect('index')
+
+@login_required
+def unlike(request, post_id):
+    user = User.objects.get(pk = request.user.id)
+    post = Posts.objects.get(person = post_id)
+    if Likes.objects.filter(post = post, likes = user).exists():
+        remove_like = Likes.objects.get(post = post)
+        remove_like.likes.remove(user)
+    else:
+        return render(request, "network/error.html", {"message": "You cannot unlike something you do not already like."})
+    return redirect('index')
+
+
 

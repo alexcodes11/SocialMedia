@@ -6,18 +6,27 @@
 {% for person in persons %}
 
 {{person.username}}
+||| {{followers}} ||| {{following}} ||| 
 
-{% if user.is_authenticated %}
-<form action="{% url 'follow' person.username %}" method="post">
-   {% csrf_token %}
-<button>Follow</button>
-</form>
+{% if user.username == person.username  %}
 
+
+{% else %}
+{% if userisfollowing == True %}
 <form action="{% url 'unfollow' person.username %}" method="post">
    {% csrf_token %}
 <button>Unfollow</button>
 </form>
+{% else %}
+<form action="{% url 'follow' person.username %}" method="post">
+   {% csrf_token %}
+<button>Follow</button>
+</form>
 {% endif %}
+
+{% endif %}
+
+
 
 {% endfor %}
 

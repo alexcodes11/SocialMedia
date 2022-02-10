@@ -13,6 +13,14 @@
       <a href="{% url 'username' post.person %}"><li>{{post.person}}</li></a>
    <li>{{post.post}}</li>
    <li>{{post.timestamp}}</li>
+    <form action="{% url 'likes' post.pk %}" method="post">
+    {% csrf_token %}
+    <button>like</button>
+    </form> 
+    <form action="{% url 'unlike' post.pk %}" method="post">
+    {% csrf_token %}
+    <button>unlike</button>
+    </form> 
 </ul>
    <br>
    {% endfor %}
