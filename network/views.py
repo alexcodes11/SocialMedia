@@ -1,9 +1,11 @@
 from distutils.log import error
+import json
 import re
 from tkinter.messagebox import RETRY
+from urllib import response
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -133,29 +135,23 @@ def unfollow(request, person_url):
 
 # Need to change this so you can like via javascript API
 @login_required
-def likes(request, post_id):
+def updatelike(request, post_id):
     user = User.objects.get(pk = request.user.id)
     post = Posts.objects.get(person = post_id)
-    if Likes.objects.filter(post = post).exists():
+    # if like already exists remove it
+    if Likes.objects.filter(post = post, likes = user).exists():
+        remove_like = Likes.objects.get(post = post)
+        remove_like.likes.remove(user)
+    # if Like post model exists  just add the user
+    elif Likes.objects.filter(post = post).exists():
         new_like = Likes.objects.get(post = post)
         new_like.likes.add(user)
         new_like.save()
+    # if the like model does not exist, create it for the post then add the user. 
     else:
         new = Likes.objects.create(post = post)
         new.likes.add(user)
         new.save()
-    return redirect('index')
-
-@login_required
-def unlike(request, post_id):
-    user = User.objects.get(pk = request.user.id)
-    post = Posts.objects.get(person = post_id)
-    if Likes.objects.filter(post = post, likes = user).exists():
-        remove_like = Likes.objects.get(post = post)
-        remove_like.likes.remove(user)
-    else:
-        return render(request, "network/error.html", {"message": "You cannot unlike something you do not already like."})
-    return redirect('index')
-
-
+    response_data = 0
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
 

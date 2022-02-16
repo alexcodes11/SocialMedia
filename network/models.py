@@ -33,12 +33,6 @@ class Likes(models.Model):
     post = models.OneToOneField(Posts, on_delete= models.CASCADE , related_name='post_id')
     likes = models.ManyToManyField(User, related_name= 'likes')
 
-    def serialize(self):
-        return {
-            "id": self.post,
-            "likes": self.likes.count()
-        }
-
 @receiver(post_save, sender=User)
 def likebutton(sender, instance, created, **kwargs):
     if created:     
