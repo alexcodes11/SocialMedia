@@ -12,9 +12,15 @@ class User(AbstractUser):
 class Posts(models.Model):
     person = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.CharField(max_length=280)
-    likes = models.ManyToManyField(User, related_name='post_like')
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "person": self.person.username,
+            "post": self.post,
+            "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p"),
+        }
     
 class Following(models.Model):
     person = models.OneToOneField(User, on_delete=models.CASCADE, related_name="peron_following" )

@@ -15,5 +15,7 @@ urlpatterns = [
     path("unfollow/<str:person_url>/", views.unfollow, name="unfollow"),
     path(r"^following(?P<user_id>\w{0,50})/$", views.following, name = "following"),
     # Via API 
-    path("updatelike/<int:post_id>", views.updatelike, name ="updatelike")
+    path("updatelike/<int:post_id>", views.updatelike, name ="updatelike"),
+    path("editpost/<int:post_id>", views.editpost, name ="editpost"), 
+    path("edit/<int:post_id>/<str:editedpost>", views.edit, name = "edit")
 ]

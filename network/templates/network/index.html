@@ -4,15 +4,36 @@
 {% block body %}
    <form action="{% url 'posts' %}" method="post">
       {% csrf_token %}
-      <textarea  name="text" cols="30" rows="10"></textarea>
+      <textarea id ="text" name="text" cols="30" rows="10"></textarea>
       <button type="submit">Post</button>
    </form>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script>
+            $(document).on("keydown","#text" ,function(evt){
+     var firstChar = $("#text").val()
+     if(evt.keyCode == 32 && firstChar == ""){
+     	return false;
+     }
+});
 
+           
+        </script>
 
    {% for post in page_obj %}
    <ul>
       <a href="{% url 'username' post.person %}"><li>{{post.person}}</li></a>
-   <li>{{post.post}}</li>
+
+   <li data-id= "{{post.pk}}" id ="test" >{{post.post}}</li>
+   
+   
+   
+
+   
+    <textarea style="display:none;" data-id= "{{post.pk}}2">{{post.post}}</textarea>
+    <button data-id="{{post.pk}}3" style="display: none;"  onclick="edit('{{post.pk}}')"> Edit Post</button>
+
+   <button data-id="{{post.pk}}4" style="display: none;" onclick="cancel()">Cancel Edit</button>
+  
    <li>{{post.timestamp}}</li>
 <i class="fa fa-thumbs-up" style="font-size:100px;color:black;"></i>
 
@@ -20,10 +41,13 @@
     
     <button onclick="updatelike('{{post.pk}}')" >unlike</button>
 
+    <button  onclick="editpost('{{post.pk}}')" > Edit </button>
 
 </ul>
    <br>
    {% endfor %}
+<p id = "yourmom">testing</p>
+   
    <div class="pagination">
     <span class="step-links">
         {% if page_obj.has_previous %}
@@ -42,5 +66,8 @@
     </span>
 </div>
 
-
+{% block scripts %}
+<script src="https://code.jquery.com/jquery.min.js"></script>
+{% endblock %}
+  
 {% endblock %}

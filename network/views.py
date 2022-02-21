@@ -2,9 +2,11 @@ from distutils.log import error
 import json
 import re
 from tkinter.messagebox import RETRY
+from turtle import pos
 from urllib import response
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
+from django.forms import NullBooleanField
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -17,6 +19,8 @@ from .models import  Likes, User, Posts, Following
 
 
 def index(request):
+    # TO DO THis will generate all the posts the current user can edit.
+    post_created = Posts.objects.filter(person = request.user.id )
     get = Posts.objects.all()
     paginator = Paginator(get, 10) 
     page_number = request.GET.get('page')
@@ -137,7 +141,7 @@ def unfollow(request, person_url):
 @login_required
 def updatelike(request, post_id):
     user = User.objects.get(pk = request.user.id)
-    post = Posts.objects.get(person = post_id)
+    post = Posts.objects.get(pk = post_id)
     # if like already exists remove it
     if Likes.objects.filter(post = post, likes = user).exists():
         remove_like = Likes.objects.get(post = post)
@@ -155,3 +159,27 @@ def updatelike(request, post_id):
     response_data = 0
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
+@login_required
+def editpost(request, post_id):
+    #check if user is the creator of the post
+    if request.method == "GET":
+        if Posts.objects.filter(pk = post_id , person = request.user.id ).exists():
+            api = Posts.objects.get(pk = post_id , person = request.user.id )
+            return JsonResponse([api.serialize()], safe=False)
+    else:
+        return JsonResponse({"error": "You cannot edit this post."}, status=400)
+
+
+@login_required
+def edit(request, post_id, editedpost):
+    if editedpost == [""]:
+        return JsonResponse({
+            "error": "At least character needed for your post."
+        })
+    if Posts.objects.filter(pk = post_id , person = request.user.id ).exists():
+        new = Posts.objects.filter(pk = post_id , person = request.user.id ).update(post = editedpost)
+        new.save()
+        post = 0
+        return HttpResponse(json.dumps(post), content_type = "application/json")
+    else:
+        return JsonResponse({"error": "You cannot edit this post."}, status=400)
