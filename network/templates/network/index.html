@@ -20,6 +20,7 @@
         </script>
 
    {% for post in page_obj %}
+   
    <ul>
       <a href="{% url 'username' post.person %}"><li>{{post.person}}</li></a>
 
@@ -35,18 +36,24 @@
    <button data-id="{{post.pk}}4" style="display: none;" onclick="cancel()">Cancel Edit</button>
   
    <li>{{post.timestamp}}</li>
+
+   <li data-id= "{{post.pk}}6">Like count: {{post.likes.count }} </li>
+
 <i class="fa fa-thumbs-up" style="font-size:100px;color:black;"></i>
 
     <button onclick="updatelike('{{post.pk}}')" >like</button>
     
     <button onclick="updatelike('{{post.pk}}')" >unlike</button>
 
+{% if post.person.username == user.username %}
     <button  onclick="editpost('{{post.pk}}')" > Edit </button>
+{% else %}
+
+{% endif %}
 
 </ul>
    <br>
-   {% endfor %}
-<p id = "yourmom">testing</p>
+    {% endfor %} 
    
    <div class="pagination">
     <span class="step-links">

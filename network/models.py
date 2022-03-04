@@ -13,12 +13,14 @@ class Posts(models.Model):
     person = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.CharField(max_length=280)
     timestamp = models.DateTimeField(auto_now_add=True)
+    likes = models.ManyToManyField(User, related_name= 'likes')
 
     def serialize(self):
         return {
             "id": self.id,
             "person": self.person.username,
             "post": self.post,
+            "likes": self.likes.count(),
             "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p"),
         }
     
@@ -33,17 +35,5 @@ class Following(models.Model):
 def update_profile_signal(sender, instance, created, **kwargs):
     if created:     
         Following.objects.create(person=instance)
-
-
-class Likes(models.Model):
-    post = models.OneToOneField(Posts, on_delete= models.CASCADE , related_name='post_id')
-    likes = models.ManyToManyField(User, related_name= 'likes')
-
-@receiver(post_save, sender=User)
-def likebutton(sender, instance, created, **kwargs):
-    if created:     
-        Likes.objects.create(post=instance)
-    
-
 
 

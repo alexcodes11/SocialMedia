@@ -13,14 +13,15 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.core.exceptions import FieldDoesNotExist
+from django.db.models import Count
 
 
-from .models import  Likes, User, Posts, Following
+
+from .models import  User, Posts, Following
 
 
 def index(request):
     # TO DO THis will generate all the posts the current user can edit.
-    post_created = Posts.objects.filter(person = request.user.id )
     get = Posts.objects.all()
     paginator = Paginator(get, 10) 
     page_number = request.GET.get('page')
@@ -141,22 +142,19 @@ def unfollow(request, person_url):
 @login_required
 def updatelike(request, post_id):
     user = User.objects.get(pk = request.user.id)
-    post = Posts.objects.get(pk = post_id)
     # if like already exists remove it
-    if Likes.objects.filter(post = post, likes = user).exists():
-        remove_like = Likes.objects.get(post = post)
+    if Posts.objects.filter(pk = post_id, likes = user).exists():
+        remove_like = Posts.objects.get(pk = post_id)
         remove_like.likes.remove(user)
     # if Like post model exists  just add the user
-    elif Likes.objects.filter(post = post).exists():
-        new_like = Likes.objects.get(post = post)
+    else:
+        new_like = Posts.objects.get(pk = post_id)
         new_like.likes.add(user)
         new_like.save()
-    # if the like model does not exist, create it for the post then add the user. 
+    if Posts.objects.filter(pk = post_id, likes__isnull = False).exists():
+        response_data = Posts.objects.filter(pk = post_id).values_list("likes").count()
     else:
-        new = Likes.objects.create(post = post)
-        new.likes.add(user)
-        new.save()
-    response_data = 0
+        response_data = 0
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 @login_required
