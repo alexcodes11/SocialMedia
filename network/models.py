@@ -23,7 +23,9 @@ class Posts(models.Model):
             "likes": self.likes.count(),
             "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p"),
         }
-    
+    def likes_as_flat_user_id_list(self):
+        return self.likes.values_list('id', flat=True)
+
 class Following(models.Model):
     person = models.OneToOneField(User, on_delete=models.CASCADE, related_name="peron_following" )
     following = models.ManyToManyField(User, related_name='following')

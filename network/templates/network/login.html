@@ -2,23 +2,47 @@
 
 {% block body %}
 
-    <h2>Login</h2>
-
+<div class="login-form">
     {% if message %}
-        <div>{{ message }}</div>
+        <div style="text-align: center;">{{ message }}</div>
     {% endif %}
-
     <form action="{% url 'login' %}" method="post">
-        {% csrf_token %}
+                {% csrf_token %}
+        <h2 class="text-center">Log in</h2>       
         <div class="form-group">
             <input autofocus class="form-control" type="text" name="username" placeholder="Username">
         </div>
         <div class="form-group">
-            <input class="form-control" type="password" name="password" placeholder="Password">
+           <input class="form-control" type="password" name="password" placeholder="Password">
         </div>
-        <input class="btn btn-primary" type="submit" value="Login">
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block">Log in</button>
+        </div>
+             
     </form>
+    <p class="text-center"><a href="{% url 'register' %}">Don't have an account? Create an Account</a></p>
+</div>
 
-    Don't have an account? <a href="{% url 'register' %}">Register here.</a>
+<style>.login-form {
+		width: 30%;
+    	margin: 50px auto;
+	}
+    .login-form form {
+    	margin-bottom: 15px;
+        background: #fff;
+        box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+        padding: 30px;
+    }
+    .login-form h2 {
+        margin: 0 0 15px;
+    }
+    .form-control, .btn {
+        min-height: 38px;
+        border-radius: 2px;
+    }
+    .btn {        
+        font-size: 15px;
+        font-weight: bold;
+    }</style>
 
 {% endblock %}

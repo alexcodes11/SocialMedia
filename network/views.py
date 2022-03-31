@@ -22,15 +22,18 @@ from .models import  User, Posts, Following
 
 def index(request):
     # TO DO THis will generate all the posts the current user can edit.
-    get = Posts.objects.all()
+    get = Posts.objects.all().order_by('-id')
     paginator = Paginator(get, 10) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return render(request, "network/index.html", {"page_obj": page_obj})
 
 def following(request, user_id):
-    names = Posts.objects.filter(person__following__person= user_id)
-    return render(request, "network/following.html", {"names": names})
+    get = Posts.objects.filter(person__following__person= user_id).order_by('-id')
+    paginator = Paginator(get, 10) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, "network/following.html", {"page_obj": page_obj})
 
 def login_view(request):
     if request.method == "POST":
@@ -72,6 +75,10 @@ def register(request):
 
         # Attempt to create new user
         try:
+            if User.objects.filter(email=email).exists():
+                return render(request, "network/register.html", {
+                    "message": "Email is already taken."
+                    })
             user = User.objects.create_user(username, email, password)
             user.save()
         except IntegrityError:
@@ -90,13 +97,14 @@ def posts(request):
         post = Posts.objects.create(person = request.user, post = text)
         post.save()
         return redirect('index')
-
+# fix the following section
 def username(request, person_url):
     if request.method == "GET":
         person = User.objects.filter(username = person_url)
-        posts = Posts.objects.filter(person__username = person_url)
+        posts = Posts.objects.filter(person__username = person_url).order_by('-id')
         if Following.objects.filter(person__username = person_url).exists():
-            following = Following.objects.filter(person__username=person_url ).count()
+            # fixed this at first I just counted the person which was one. My bug was I need to count the following field which i fixed below.
+            following = Following.objects.filter(person__username = person_url ).values_list("following").count()
         else:
             following = 0
         if Following.objects.filter(following__username = person_url).exists():
@@ -151,10 +159,15 @@ def updatelike(request, post_id):
         new_like = Posts.objects.get(pk = post_id)
         new_like.likes.add(user)
         new_like.save()
+    response_data = {}
     if Posts.objects.filter(pk = post_id, likes__isnull = False).exists():
-        response_data = Posts.objects.filter(pk = post_id).values_list("likes").count()
+        response_data["count"] = Posts.objects.filter(pk = post_id).values_list("likes").count()
     else:
-        response_data = 0
+        response_data["count"] = 0
+    if Posts.objects.filter(pk = post_id, likes = request.user.id):
+        response_data["liked"] = "liked"
+    else:
+        response_data["liked"] = "unlike"
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 @login_required
