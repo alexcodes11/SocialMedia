@@ -28,11 +28,19 @@ def index(request):
     page_obj = paginator.get_page(page_number)
     return render(request, "network/index.html", {"page_obj": page_obj})
 
+
+@login_required
 def following(request, user_id):
-    get = Posts.objects.filter(person__following__person= user_id).order_by('-id')
-    paginator = Paginator(get, 10) 
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    #Here I had only let the specific user accesses their own following page. Because if I do not do this then a hacker can access any following page.
+    if request.user == User.objects.get(pk = user_id):
+        get = Posts.objects.filter(person__following__person= user_id).order_by('-id')
+        paginator = Paginator(get, 10) 
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+    else:
+        return render(request, "network/following.html", {
+                "message": "You cannot access this page"
+            })
     return render(request, "network/following.html", {"page_obj": page_obj})
 
 def login_view(request):
