@@ -1,7 +1,6 @@
 from distutils.log import error
 import json
 import re
-from tkinter.messagebox import RETRY
 from turtle import pos
 from urllib import response
 from django.contrib.auth import authenticate, login, logout
