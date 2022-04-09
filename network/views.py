@@ -128,21 +128,22 @@ def username(request, person_url):
         return render(request, "network/userprofile.html", {"persons": person, "posts": posts, "followers": followers, "following":following, "userisfollowing": userisfollowing})
 
 # come back to this later and make sure the user cannot follow themselves. Already removed the button though templates but gotta make sure.
-@login_required
 def follow(request, person_url):
     if request.method == "POST":
-        user = User.objects.get(pk = request.user.id)
-        follow = User.objects.get(username = person_url)
-        if Following.objects.filter(person = user ).exists():
-            test = Following.objects.get(person = user )
-            test.following.add(follow.id)
-            test.save()
-        else: 
-            new = Following.objects.create(person = user)
-            new.following.add(follow.id)
-            new.save()
-        return redirect('username', person_url)
-        
+        if request.user.is_authenticated:
+            user = User.objects.get(pk = request.user.id)
+            follow = User.objects.get(username = person_url)
+            if Following.objects.filter(person = user ).exists():
+                test = Following.objects.get(person = user )
+                test.following.add(follow.id)
+                test.save()
+            else: 
+                new = Following.objects.create(person = user)
+                new.following.add(follow.id)
+                new.save()
+            return redirect('username', person_url)
+        else:
+            return render(request, "network/error.html", {"message": "Please login or register to follow this user!!!"})
 
 @login_required
 def unfollow(request, person_url):
