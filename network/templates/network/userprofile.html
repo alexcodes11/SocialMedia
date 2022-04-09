@@ -21,7 +21,11 @@
           <span class="text-muted">followers</span>
         </a>
         <a href="#" class="d-inline-block text-dark ml-3">
+           {% if following == None %}
+           <strong>0</strong>
+            {% else %}
           <strong>{{following}}</strong>
+           {% endif %}
           <span class="text-muted">following</span>
         </a>
       </div>

@@ -91,12 +91,14 @@ def register(request):
     else:
         return render(request, "network/register.html")
 
-@login_required
 def posts(request):
     if request.method == "POST":
-        text = request.POST["text"]
-        post = Posts.objects.create(person = request.user, post = text)
-        post.save()
+        if request.user.is_authenticated:
+            text = request.POST["text"]
+            post = Posts.objects.create(person = request.user, post = text)
+            post.save()
+        else: 
+            return render(request, "network/error.html", {"message": "Please login or register to create a post!!!"})
         return redirect('index')
 # fix the following section
 def username(request, person_url):
@@ -105,7 +107,14 @@ def username(request, person_url):
         posts = Posts.objects.filter(person__username = person_url).order_by('-id')
         if Following.objects.filter(person__username = person_url).exists():
             # fixed this at first I just counted the person which was one. My bug was I need to count the following field which i fixed below.
-            following = Following.objects.filter(person__username = person_url ).values_list("following").count()
+            following = Following.objects.filter(person__username = person_url ).values("following")
+            for first in following:
+                if first["following"] == None:
+                    following = 0
+                    break
+                else:
+                    following = Following.objects.filter(person__username = person_url ).values("following").count()
+                    break
         else:
             following = 0
         if Following.objects.filter(following__username = person_url).exists():
