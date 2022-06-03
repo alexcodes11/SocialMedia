@@ -3,6 +3,52 @@
 
 {% block body %}
 
+{% if user.is_authenticated == False %}
+<!-- set up the modal to start hidden and fade in and out -->
+<div id="myModal" class="modal fade bd-example-modal-lg" style="text-align:center ;" >
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <!-- dialog body -->
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                 <h5 style="text-align:center ;">Welcome to My Social Media Website!!</h5>
+                 <hr>
+                <p> For those just wanting to try out this application use these credentials to login: </p>
+                <p><b>Username and Password: demo</b> </p> 
+               <p><a href="{% url 'login' %}" class="tooltip-test" title="Tooltip">Login Here!</a> </p>
+               <p>Enjoy :)</p>
+            </div>
+            <!-- dialog buttons -->
+            </div>
+        </div>
+    </div>
+</div>
+        
+<!-- sometime later, probably inside your on load event callback -->
+<script>
+    $("#myModal").on("show", function() {    // wire up the OK button to dismiss the modal when shown
+        $("#myModal a.btn").on("click", function(e) {
+            console.log("button pressed");   // just as an example...
+            $("#myModal").modal('hide');     // dismiss the dialog
+        });
+    });
+        
+    $("#myModal").on("hide", function() {    // remove the event listeners when the dialog is dismissed
+        $("#myModal a.btn").off("click");
+    });
+            
+    $("#myModal").on("hidden", function() {  // remove the actual elements from the DOM when fully hidden
+        $("#myModal").remove();
+    });
+            
+    $("#myModal").modal({                    // wire up the actual modal functionality and show the dialog
+        "backdrop"  : "static",
+        "keyboard"  : true,
+        "show"      : true                     // ensure the modal is shown immediately
+    });
+</script>
+
+{% endif %}
  <div class="col-lg-7 col-xl-6 mx-auto mt-5">
                 <div class="card card-white grid-margin">
                     <div class="card-body">

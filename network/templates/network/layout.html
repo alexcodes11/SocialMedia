@@ -28,28 +28,28 @@
                     </li>
                 {% endif %}
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'index' %}">All Posts</a>
+                  <a class="nav-link" href="{% url 'index' %}"><strong>All Posts</strong></a>
                 </li>
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'following' user.id %}">Following</a>
+                        <a class="nav-link" href="{% url 'following' user.id %}"><strong>Following</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                        <a class="nav-link" href="{% url 'logout' %}"><strong>Log Out</strong></a>
                     </li>
                 {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                        <a class="nav-link" href="{% url 'login' %}"><strong>Log In</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                        <a class="nav-link" href="{% url 'register' %}"><strong>Register</strong></a>
                     </li>
                 {% endif %}
               </ul>
             </div>
             </div>
           </nav>
-        
+          
         <div class="body">
             {% block body %}
             {% endblock %}

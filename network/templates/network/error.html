@@ -4,10 +4,22 @@
 
 {% block body %}
 <div style="display: grid; justify-content: center; margin-top: 10%;">
-<img src="{% static 'network/images/oops.png' %}" alt="My image">
-<div style="text-align: center;">
-{{message}}
+    
+<div style="justify-content:center; text-align: center;">
+    {{message}}
 </div>
+<br>
+
+<div style="display: flex; justify-content: center;">
+<img src="{% static 'network/images/oops.png' %}" alt="My image">
+</div>
+<br>
+<div style="justify-content:center; text-align: center;">
+For those just trying out the app <a  href="{% url 'login' %}">Login Here!! </a> Username and Password: demo
+
+</div>
+
+
 </div>
 {% endblock %}
 
