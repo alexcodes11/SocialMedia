@@ -1,4 +1,4 @@
-# SocialMedia
+# SocialMedia App 
 In this project I made a dynamic social media app like twitter using Django, Javascript, HTML, CSS, and Bootstrap. 
 You can access the webiste with this link 
 https://socialnetworkapp10.herokuapp.com/
